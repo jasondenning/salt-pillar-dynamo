@@ -20,13 +20,12 @@ In the master config file:
             table: my_pillar_table  # REQUIRED - set to your DynamoDB table name
             region: us-east-1       # Optional - default is 'us-east-1'
             id_field: id            # Optional - the field to query for minion_id; default is 'id'
-            pillar_field: pillar    # Optional - the field that contains JSON formatted pillar data; default is 'pillar'
 '''
 
 __author__ = 'Jason Denning <jason@ngeniux.com>'
 __copyright__ = 'Copyright (c) 2014 Jason Denning'
 __license__ = 'Apache License v2.0 - http://www.apache.org/licenses/LICENSE-2.0'
-__version__ = '0.1'
+__version__ = '0.2'
 
 
 
@@ -76,6 +75,23 @@ def __virtual__():
     log.debug("Loading DynamoDB Pillar")
     return(__virtualname__)
 
+def key_value_to_tree(data):
+    """
+    Builds a hierarchical dict from a flat-namespaced dict.
+    e.g. given : {'foo.bar.baz' : 1, 'foo.biz' : 'a'}
+    will return : {'foo' : {'bar' : {'baz' : 1}, 'biz' : 'a'} }
+    """
+    tree = {}
+    for flatkey, value in data.items():
+        t = tree
+        keys = flatkey.split('.')
+        for key in keys:
+            if key == keys[-1]:
+                # last key, so set the value
+                t[key] = value
+            else:
+                t = t.setdefault(key, {})
+    return(tree)
 
 def ext_pillar(minion_id, pillar, **kw):
     '''
@@ -87,7 +103,6 @@ def ext_pillar(minion_id, pillar, **kw):
         # table is not set in config
         raise SaltInvocationError('ext_pillar.dynamo: table name is not defined in ext_pillar config!')
     id_field = kw.get('id_field', 'id')
-    pillar_field = kw.get('pillar_field', 'pillar')
 
     try:
         minion_table = Table(table_name)
@@ -103,7 +118,16 @@ def ext_pillar(minion_id, pillar, **kw):
         minion_query_args[id_field] = minion_id
         # Query for the minion_id
         minion_record = minion_table.get_item(**minion_query_args)
-        pillar_data = json.loads(minion_record.get(pillar_field, "{}"))
+        # Copy Dynamo Item to dict
+        pillar_data = {}
+        for k, v in minion_record.items():
+            pillar_data[k] = v
+
+        # Delete the id key from the data_dict
+        del pillar_data[id_field]
+
+        # Convert flat-namespaced dict to hierarchical dict
+        pillar_data = key_value_to_tree(pillar_data)
         return(pillar_data)
 
     except Exception, e:
