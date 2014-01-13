@@ -6,6 +6,8 @@ Use an Amazon Web Services DynamoDB table as a Pillar data source
 Installation:
 -------------
 
+
+
 Configuration:
 --------------
 
@@ -20,6 +22,13 @@ In the master config file:
             id_field: id            # Optional - the field to query for minion_id; default is 'id'
             pillar_field: pillar    # Optional - the field that contains JSON formatted pillar data; default is 'pillar'
 '''
+
+__author__ = 'Jason Denning <jason@ngeniux.com>'
+__copyright__ = 'Copyright (c) 2014 Jason Denning'
+__license__ = 'Apache License v2.0 - http://www.apache.org/licenses/LICENSE-2.0'
+__version__ = '0.1'
+
+
 
 from salt.exceptions import SaltInvocationError
 
