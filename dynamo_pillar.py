@@ -52,13 +52,16 @@ Usage:
 
  - Keys which include the '.' character, will be transformed into a hierarchical python dict
         e.g. if your DynamoDB record looks like this:
+.. code-block:: yaml
 
-            ssh.port = 22
-            ssh.password.authentication = yes
-            ssh.password.permitEmpty = no
-            foo.bar.baz = fiz
+            id : minion1
+            ssh.port : 22
+            ssh.password.authentication : yes
+            ssh.password.permitEmpty : no
+            foo.bar.baz : fiz
 
         the returned pillar for the node will be:
+.. code-block:: python
 
             {'ssh' : {
                 'port' : '22',
@@ -70,7 +73,6 @@ Usage:
                  'bar' : {
                      'baz' : 'fiz'
                  }}}
-
 
 
 '''
