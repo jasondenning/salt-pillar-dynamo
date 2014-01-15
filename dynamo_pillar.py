@@ -113,12 +113,6 @@ except ImportError:
 
 
 def __virtual__():
-    # Check to see if this ext_pillar is configured
-    ext_pillar_sources = [p for p in __opts__.get('ext_pillar', p)]
-    if not any(__virtualname__ in p for p in ext_pillar_sources):
-        # This pillar was not configured
-        return(False)
-
     if not HAS_BOTO:
         log.error("DynamoDB ext_pillar is configured, but unable to load boto.dynamodb2 library!")
         return(False)
@@ -127,7 +121,7 @@ def __virtual__():
         log.error("DynamoDB ext_pillar is configured, but unable to load json library!")
         return(False)
 
-    log.debug("Loading DynamoDB Pillar")
+    log.debug("Loading DynamoDB ext_pillar")
     return(__virtualname__)
 
 def key_value_to_tree(data):
