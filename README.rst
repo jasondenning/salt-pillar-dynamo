@@ -52,6 +52,7 @@ Usage:
 
  - Keys which include the '.' character, will be transformed into a hierarchical python dict
         e.g. if your DynamoDB record looks like this:
+
 .. code-block:: yaml
 
             id : minion1
@@ -59,6 +60,8 @@ Usage:
             ssh.password.authentication : yes
             ssh.password.permitEmpty : no
             foo.bar.baz : fiz
+
+
 
         the returned pillar for the node will be:
 .. code-block:: python
